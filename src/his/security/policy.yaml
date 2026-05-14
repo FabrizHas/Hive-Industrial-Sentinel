@@ -1,0 +1,62 @@
+version: "1.0"
+policy_name: "hive-industrial-sentinel-demo"
+default_action: ALLOW
+
+ingress_rules:
+  - name: block_high_risk_phrases
+    description: "Blocks direct high-risk phrases related to alarm suppression or forced loading."
+    priority: 210
+    action: DENY
+    deny_message: "[HIS SHIELD] Blocked: high-risk command phrase detected."
+    patterns:
+      - "(?i)\\bignore\\s+alarms?\\b"
+      - "(?i)\\bforce\\s+load\\b"
+
+  - name: block_alarm_override
+    description: "Blocks attempts to ignore or bypass industrial alarms."
+    priority: 200
+    action: DENY
+    deny_message: "[HIS SHIELD] Blocked: operator request attempts to bypass alarms."
+    patterns:
+      - "(?i)ignore\\s+(all\\s+)?alarms?"
+      - "(?i)bypass\\s+(safety|alarm|interlock)"
+      - "(?i)disable\\s+(safety|safeguards?|interlocks?|alarms?)"
+
+  - name: block_forced_overload
+    description: "Blocks commands that force the transformer above safe load limits."
+    priority: 190
+    action: DENY
+    deny_message: "[HIS SHIELD] Blocked: requested load violates the 120% emergency limit."
+    patterns:
+      - "(?i)force\\s+load\\s+(above|over|to)\\s+120%"
+      - "(?i)set\\s+load\\s+(above|over|to)\\s+120%"
+      - "(?i)operate\\s+(above|over)\\s+120%"
+
+  - name: block_prompt_injection
+    description: "Blocks prompt injection attempts that try to override system instructions."
+    priority: 180
+    action: DENY
+    deny_message: "[HIS SHIELD] Blocked: prompt injection pattern detected."
+    patterns:
+      - "(?i)ignore\\s+(previous|all)\\s+instructions"
+      - "(?i)you\\s+are\\s+now\\s+(developer|system|admin)"
+      - "(?i)reveal\\s+(the\\s+)?system\\s+prompt"
+
+egress_rules:
+  - name: block_high_risk_output_phrases
+    description: "Blocks direct high-risk output phrases related to alarm suppression or forced loading."
+    priority: 210
+    action: DENY
+    deny_message: "[HIS SHIELD] Blocked: unsafe high-risk phrase detected."
+    patterns:
+      - "(?i)\\bignore\\s+alarms?\\b"
+      - "(?i)\\bforce\\s+load\\b"
+
+  - name: block_unsafe_recommendation
+    description: "Blocks model outputs recommending alarm bypass or unsafe overload."
+    priority: 200
+    action: DENY
+    deny_message: "[HIS SHIELD] Blocked: unsafe recommendation detected."
+    patterns:
+      - "(?i)ignore\\s+(the\\s+)?alarms?"
+      - "(?i)force\\s+load\\s+(above|over|to)\\s+120%"

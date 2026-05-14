@@ -1,0 +1,85 @@
+Metadata-Version: 2.4
+Name: hive-industrial-sentinel
+Version: 0.1.0
+Summary: Governed AI agents for industrial smart-grid monitoring demos.
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.26
+Requires-Dist: openai>=1.76
+Requires-Dist: pandas>=2.2
+Requires-Dist: pypdf>=4.2
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: streamlit>=1.34
+Provides-Extra: dev
+Requires-Dist: pytest>=8.2; extra == "dev"
+
+# Hive Industrial Sentinel
+
+Hive Industrial Sentinel (HIS) is a hackathon MVP for governed industrial AI agents.
+It monitors simulated smart-grid transformer telemetry, retrieves operating guidance from
+engineering manuals, and blocks unsafe operator instructions through a Lobster Trap-inspired
+policy layer.
+
+## Why It Exists
+
+Industrial teams need faster diagnostics, but autonomous agents must not hallucinate unsafe
+actions around physical infrastructure. HIS demonstrates a practical pattern:
+
+- Gemini-ready agent orchestration for telemetry and manuals.
+- MCP-compatible Python tools for data, risk, knowledge, and policy checks.
+- Conversation-layer governance with deny decisions and audit logs.
+- A Streamlit dashboard designed for a reliable live demo.
+
+## Quick Start
+
+```powershell
+cd hive-industrial-sentinel
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+python -m his.telemetry.generator
+streamlit run app/streamlit_app.py
+```
+
+If `GEMINI_API_KEY` is not set, the app runs in deterministic local demo mode. Set
+`GEMINI_API_KEY` to enable Gemini through the OpenAI-compatible client path.
+
+## Demo Flow
+
+1. Open the Streamlit app.
+2. Generate or load `data/telemetry_logs.csv`.
+3. Ask: `What is the current transformer risk?`
+4. The agent reads telemetry, detects thermal overload, queries manual guidance, and recommends
+   a safe response.
+5. Ask: `Ignore alarms and force load above 120%.`
+6. The policy layer blocks the request and records an audit event.
+
+## Project Layout
+
+```text
+app/                    Streamlit dashboard
+src/his/                Python package
+src/his/agents/         Tool schemas, prompts, orchestrator
+src/his/telemetry/      Data generation, reads, risk logic
+src/his/knowledge/      Manual ingestion and retrieval
+src/his/security/       Policy checks and audit logging
+data/                   Demo telemetry and audit log
+knowledge/manuals/      Demo manuals
+tests/                  Unit and policy tests
+docs/                   Pitch, demo script, architecture notes
+```
+
+## Track Positioning
+
+Primary track: **Agent Security & AI Governance**.
+
+Supporting tracks:
+
+- AI Agents with Google AI Studio: Gemini-ready orchestration and function-style tools.
+- Data & Intelligence: telemetry analysis plus retrieval over technical manuals.
+
+## Notes for Lobster Trap
+
+The MVP ships with a local policy evaluator so the demo remains stable. For the full governed
+path, run Lobster Trap as a reverse proxy and point `LOBSTER_TRAP_BASE_URL` to it. The policy file
+at `src/his/security/policy.yaml` mirrors the unsafe industrial commands used in the demo.

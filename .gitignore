@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.streamlit/secrets.toml
+.env
+
+data/audit_log.jsonl
+knowledge/index/
+
+# Data and Logs
+data/*.csv
+data/*.jsonl
+knowledge/manuals/*.pdf
+!knowledge/manuals/transformer_operations_manual.md
+
+# OS generated files
+.DS_Store
+Thumbs.db
